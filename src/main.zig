@@ -314,7 +314,10 @@ pub fn main() anyerror!void {
                     state = .Registers;
                 } else if (ascii.eqlIgnoreCase(chunk.tag, "name")) {
                     if (chunk.data) |data| {
-                        try cur_reg.name.insertSlice(0, data);
+                        // Some register names end with `[%s]`. Strip this to get a properly named identifier.
+                        var it = mem.tokenizeSequence(u8, data, "[%s]");
+                        const name_without_suffix = it.next().?;
+                        try cur_reg.name.insertSlice(0, name_without_suffix);
                     }
                 } else if (ascii.eqlIgnoreCase(chunk.tag, "displayName")) {
                     if (chunk.data) |data| {
