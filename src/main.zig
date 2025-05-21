@@ -383,7 +383,7 @@ pub fn main() anyerror!void {
                     if (chunk.data) |data| {
                         const len = data.len;
                         const s = data[1 .. len - 1];
-                        var it = std.mem.split(u8, s, ":");
+                        var it = std.mem.splitAny(u8, s, ":");
                         const msb = try fmt.parseInt(u32, it.next() orelse unreachable, 10);
                         const lsb_str = it.next() orelse unreachable;
                         var lsb: u32 = undefined;
@@ -466,10 +466,10 @@ fn getChunk(line: []const u8) ?XmlChunk {
     };
 
     const trimmed = mem.trim(u8, line, " \n");
-    var toker = mem.tokenize(u8, trimmed, "<>"); //" =\n<>\"");
+    var toker = mem.tokenizeAny(u8, trimmed, "<>"); //" =\n<>\"");
 
     if (toker.next()) |maybe_tag| {
-        var tag_toker = mem.tokenize(u8, maybe_tag, " =\"");
+        var tag_toker = mem.tokenizeAny(u8, maybe_tag, " =\"");
         chunk.tag = tag_toker.next() orelse return null;
         if (tag_toker.next()) |maybe_tag_property| {
             if (ascii.eqlIgnoreCase(maybe_tag_property, "derivedFrom")) {
